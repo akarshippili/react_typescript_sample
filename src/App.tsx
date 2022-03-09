@@ -1,25 +1,63 @@
 import './App.css';
-import { useState } from 'react';
-import Test from './test';
+import { SetStateAction, useState } from 'react';
+import Title from './components/Title';
+import Modal from './components/Modal';
+import { Event } from './Event';
+import EventList from './components/EventList';
+import NewEventForm from './components/NewEventForm';
 
 function App() {
+  const [showEvents, setShowEvents] = useState<boolean>(true);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [ showModal, setModal ] = useState<boolean>(false)
 
-  const [name, setName] = useState('world');
-  const [count, setCount] = useState(0);
-  function increment() {
-    setCount(count + 1);
+  const handleDelete = (id:number) => {
+    setEvents(
+      (prevEvents) => {
+        return prevEvents.filter(event => event.id !== id);
+      });
   }
 
-  function handelClose(){
-    setName('React');
-    console.log(name)
+  const handleAddEvent = (newEvent:Event) => {
+    setEvents((prevEvents) => {
+        return [...prevEvents, newEvent];
+    });
+
+    setModal(false);
   }
+
 
   return (
     <div className="App">
-      <h1>Current count: {count}</h1>
-      <button onClick={ increment }>Increment</button>
-      <Test name={name} handelClose={handelClose} />
+      
+      <Title title="Mario Kingdom Evets" subtitle="All the latest events in mario kingdom" />
+      
+      { showEvents && (
+        <div>
+          <button onClick={ () => setShowEvents(false) }>
+            Hide Events
+          </button> 
+        </div>
+      )}
+      
+      { !showEvents && (
+        <div>
+          <button onClick={ () => setShowEvents(true) }>
+            Show Events
+          </button> 
+        </div>
+      )}
+
+      <button onClick={()=>setModal(true)}>Add New Event</button>
+
+      {showEvents &&  <EventList events={events} handleDelete={handleDelete} />}
+
+      {showModal && (
+        <Modal isSalesModal={true} >
+          <NewEventForm handleAddEvent={handleAddEvent}  />
+        </Modal>
+      )}
+
     </div>
   );
 }
